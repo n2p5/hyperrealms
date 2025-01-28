@@ -20,33 +20,43 @@ import (
 )
 
 const (
-	goVersion        = "1.23.5"
-	goModCacheVolume = "hyperrealms-mod-cache"
-	containerSrcDir  = "/src"
-	containerModDir  = "/go/pkg/mod"
+	goVersion         = "1.23.5"
+	buildImage        = "golang:" + goVersion
+	cachePrefix       = "hyperrealms"
+	containerSrcDir   = "/src"
+	containerModDir   = "/go/pkg/mod"
+	containerCacheDir = "/cache/go-build"
 )
 
 type Hyperrealms struct{}
 
 // Return the result of running unit tests
 func (m *Hyperrealms) Test(ctx context.Context, src *dagger.Directory) (string, error) {
+	goCache := dag.CacheVolume(cachePrefix + "-test-cache")
 	return m.BuildEnv(src).
+		WithMountedCache(containerCacheDir, goCache).
 		WithExec([]string{"go", "test", ".", "-v"}).
 		Stdout(ctx)
 }
 
 func (m *Hyperrealms) Build(ctx context.Context, src *dagger.Directory) (string, error) {
+	goCache := dag.CacheVolume(cachePrefix + "-test-cache")
 	return m.BuildEnv(src).
+		WithMountedCache(containerCacheDir, goCache).
 		WithExec([]string{"go", "build", "-o", "app"}).
 		Stdout(ctx)
 }
 
 func (m *Hyperrealms) BuildEnv(src *dagger.Directory) *dagger.Container {
-	goModCache := dag.CacheVolume(goModCacheVolume)
+	goModCache := dag.CacheVolume(cachePrefix + "-mod-cache")
+	goCache := dag.CacheVolume(cachePrefix + "-go-cache")
 	return dag.Container().
-		From("golang:"+goVersion).
+		From(buildImage).
 		WithDirectory(containerSrcDir, src).
 		WithWorkdir(containerSrcDir).
-		WithMountedCache("/go/pkg/mod", goModCache).
-		WithEnvVariable("GOMODCACHE", containerModDir)
+		WithMountedCache(containerModDir, goModCache).
+		WithEnvVariable("GOMODCACHE", containerModDir).
+		WithMountedCache(containerCacheDir, goCache).
+		WithEnvVariable("GOCACHE", containerCacheDir).
+		WithExec([]string{"go", "mod", "download"})
 }
