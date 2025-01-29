@@ -32,19 +32,13 @@ type Hyperrealms struct{}
 
 // Return the result of running unit tests
 func (m *Hyperrealms) Test(ctx context.Context, src *dagger.Directory) (string, error) {
-	goCache := dag.CacheVolume(cachePrefix + "-test-cache")
 	return m.BuildEnv(src).
-		WithMountedCache(containerCacheDir, goCache).
 		WithExec([]string{"go", "test", ".", "-v"}).
 		Stdout(ctx)
 }
 
-func (m *Hyperrealms) Build(ctx context.Context, src *dagger.Directory) (string, error) {
-	goCache := dag.CacheVolume(cachePrefix + "-test-cache")
-	return m.BuildEnv(src).
-		WithMountedCache(containerCacheDir, goCache).
-		WithExec([]string{"go", "build", "-o", "app"}).
-		Stdout(ctx)
+func (m *Hyperrealms) Build(ctx context.Context, src *dagger.Directory) *dagger.Container {
+	return m.BuildEnv(src).WithExec([]string{"go", "build", "-o", "server"})
 }
 
 func (m *Hyperrealms) BuildEnv(src *dagger.Directory) *dagger.Container {
@@ -55,8 +49,8 @@ func (m *Hyperrealms) BuildEnv(src *dagger.Directory) *dagger.Container {
 		WithDirectory(containerSrcDir, src).
 		WithWorkdir(containerSrcDir).
 		WithMountedCache(containerModDir, goModCache).
-		WithEnvVariable("GOMODCACHE", containerModDir).
 		WithMountedCache(containerCacheDir, goCache).
 		WithEnvVariable("GOCACHE", containerCacheDir).
+		WithEnvVariable("GOMODCACHE", containerModDir).
 		WithExec([]string{"go", "mod", "download"})
 }
