@@ -38,7 +38,10 @@ func (m *Hyperrealms) Test(ctx context.Context, src *dagger.Directory) (string, 
 }
 
 func (m *Hyperrealms) Build(ctx context.Context, src *dagger.Directory) *dagger.Container {
-	return m.BuildEnv(src).WithExec([]string{"go", "build", "-o", "server"})
+	return m.BuildEnv(src).
+		WithExec([]string{"go", "build", "-o", "server"}).
+		WithExposedPort(8080).
+		WithEntrypoint([]string{"/src/server"})
 }
 
 func (m *Hyperrealms) BuildEnv(src *dagger.Directory) *dagger.Container {
