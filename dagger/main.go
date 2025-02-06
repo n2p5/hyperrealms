@@ -37,6 +37,12 @@ func (m *Hyperrealms) Test(ctx context.Context, src *dagger.Directory) (string, 
 		Stdout(ctx)
 }
 
+func (m *Hyperrealms) Dev(ctx context.Context, src *dagger.Directory) *dagger.Service {
+	return m.Build(ctx, src).
+		WithMountedDirectory(containerSrcDir+"/tmp", src).
+		AsService(dagger.ContainerAsServiceOpts{Args: []string{"./tmp/scripts/dev.sh"}})
+}
+
 func (m *Hyperrealms) Build(ctx context.Context, src *dagger.Directory) *dagger.Container {
 	return m.BuildEnv(src).
 		WithExec([]string{"go", "build", "-o", "server"}).
@@ -55,5 +61,7 @@ func (m *Hyperrealms) BuildEnv(src *dagger.Directory) *dagger.Container {
 		WithMountedCache(containerCacheDir, goCache).
 		WithEnvVariable("GOCACHE", containerCacheDir).
 		WithEnvVariable("GOMODCACHE", containerModDir).
+		WithExec([]string{"apt-get", "update"}).
+		WithExec([]string{"apt-get", "install", "-y", "entr"}).
 		WithExec([]string{"go", "mod", "download"})
 }

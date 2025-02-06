@@ -17,6 +17,7 @@ func main() {
 	}
 
 	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		fmt.Println("called test")
 		fmt.Fprintf(w, "Hello, %s!", r.URL.Path[1:])
 	})
 	http.ListenAndServe(":"+port, nil)
