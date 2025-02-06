@@ -2,10 +2,4 @@
 
 set -euxo pipefail
 
-cd tmp
-touch blah5.txt
-ls -alh
-sleep 10
-ls -alh
-sleep 5
-# find . -name "*.go" -type f | entr -n -r go run .
+find . -name "*.go" -type f | entr -r dagger -s call dev --src=. up
