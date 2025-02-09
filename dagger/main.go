@@ -22,10 +22,11 @@ import (
 const (
 	goVersion         = "1.23.5"
 	buildImage        = "golang:" + goVersion
-	cachePrefix       = "hyperrealms"
+	projectName       = "hyperrealms"
 	containerSrcDir   = "/src"
 	containerModDir   = "/go/pkg/mod"
 	containerCacheDir = "/cache/go-build"
+	serverPort        = 8080
 )
 
 type Hyperrealms struct{}
@@ -43,14 +44,14 @@ func (m *Hyperrealms) Dev(ctx context.Context, src *dagger.Directory) *dagger.Se
 
 func (m *Hyperrealms) Build(ctx context.Context, src *dagger.Directory) *dagger.Container {
 	return m.BuildEnv(src).
-		WithExec([]string{"go", "build", "-o", "server"}).
-		WithExposedPort(8080).
-		WithEntrypoint([]string{"/src/server"})
+		WithExec([]string{"go", "build", "-o", projectName}).
+		WithExposedPort(serverPort).
+		WithEntrypoint([]string{containerSrcDir + "/" + projectName})
 }
 
 func (m *Hyperrealms) BuildEnv(src *dagger.Directory) *dagger.Container {
-	goModCache := dag.CacheVolume(cachePrefix + "-mod-cache")
-	goCache := dag.CacheVolume(cachePrefix + "-go-cache")
+	goModCache := dag.CacheVolume(projectName + "-mod-cache")
+	goCache := dag.CacheVolume(projectName + "-go-cache")
 	return dag.Container().
 		From(buildImage).
 		WithDirectory(containerSrcDir, src).
