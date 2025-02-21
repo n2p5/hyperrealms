@@ -1,6 +1,6 @@
 {
   "name": "hyperrealms",
-  "engineVersion": "v0.15.2",
+  "engineVersion": "v0.16.1",
   "sdk": "go",
   "source": "dagger"
 }

@@ -26,7 +26,7 @@ const (
 	containerSrcDir   = "/src"
 	containerModDir   = "/go/pkg/mod"
 	containerCacheDir = "/cache/go-build"
-	serverPort        = 8080
+	serverPort        = 9001
 )
 
 type Hyperrealms struct{}
