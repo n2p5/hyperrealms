@@ -13,6 +13,14 @@ const (
 	defaultPort = "9001"
 )
 
+// TODO:
+// - hyperreals is about creating a simple way to use htmx
+// - with smart contracts on gno.land
+// - func HyperRender(method, path, headers, data string) string
+// - the idea is that a rest call can be translated into a hyper realm call
+// - this doesn't have to be used with HTMX, but it could support partial
+// - fragment responses.
+
 func main() {
 	port := os.Getenv("HYPERREALMS_PORT")
 	if port == "" {

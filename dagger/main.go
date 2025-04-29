@@ -20,7 +20,7 @@ import (
 )
 
 const (
-	goVersion         = "1.23.5"
+	goVersion         = "1.24.2"
 	buildImage        = "golang:" + goVersion
 	projectName       = "hyperrealms"
 	containerSrcDir   = "/src"
