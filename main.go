@@ -35,3 +35,10 @@ func main() {
 
 	http.ListenAndServe(":"+port, r)
 }
+
+// Ideas
+// imagine you are given a subdomain or a path that was "yours"
+// storage would be on gnoland directly or using a blessed CDN
+// we would have a limited amount of javascript embedded, specifically htmx
+// things like webrings would be first-class citizens
+// maybe some additional javascript functionality would be allowed, but limited
